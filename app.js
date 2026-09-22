@@ -190,5 +190,55 @@
   $('#equationLinks').innerHTML='<div class="comparison-grid"><div class="mini"><strong>Gravity</strong><p>F → g → V → orbit</p></div><div class="mini"><strong>Electric</strong><p>F → E → V → capacitance</p></div><div class="mini"><strong>Magnetic</strong><p>F → flux → induction → AC</p></div></div>';
   $('#specMap').innerHTML=D.specMap.map(r=>'<div class="spec-card"><strong>'+esc(r[0])+'</strong><span>'+esc(r[1])+'</span><span>'+esc(r[2])+'</span><span>'+esc(r[3])+'</span></div>').join('');
 
+  const quizBank=D.lessons.flatMap(l=>{
+    const q=[{spec:l.code,q:l.check[0],choices:l.check[1],correct:l.check[2],hint:l.examTip,explain:l.check[3]}];
+    (l.retrieval||[]).slice(0,2).forEach((r,ri)=>{
+      const distract=D.lessons.flatMap(z=>z.retrieval||[]).map(a=>a[1]).filter(a=>a!==r[1]);
+      const picks=[];
+      for(let j=0;j<distract.length&&picks.length<3;j++){
+        const a=distract[(j*7+D.lessons.indexOf(l)*3+ri*11)%distract.length];
+        if(a&&!picks.includes(a)) picks.push(a);
+      }
+      const choices=[r[1],...picks].sort(()=>Math.random()-.5);
+      q.push({spec:l.code,q:r[0],choices,correct:choices.indexOf(r[1]),hint:'Think back to the core definition or relationship from '+l.title+'.',explain:r[1]});
+    });
+    return q;
+  });
+  let quizOrder=[],quizIndex=0,quizScore=0,quizStreak=0,quizAnswered=false;
+  function newQuiz(){
+    quizOrder=[...quizBank].sort(()=>Math.random()-.5).slice(0,Math.min(20,quizBank.length));
+    quizIndex=0;quizScore=0;quizStreak=0;renderQuiz();
+  }
+  function renderQuiz(){
+    if(!$('#quizQuestion')) return;
+    const q=quizOrder[quizIndex]||quizBank[0];
+    quizAnswered=false;
+    $('#quizProgress').textContent=(quizIndex+1)+' / '+quizOrder.length;
+    $('#quizProgressFill').style.width=(100*(quizIndex+1)/quizOrder.length)+'%';
+    $('#quizScore').textContent=quizScore;
+    $('#quizStreak').textContent=quizStreak;
+    $('#quizSpec').textContent='AQA '+q.spec;
+    $('#quizQuestion').textContent=q.q;
+    $('#quizHint').textContent=q.hint;
+    $('#quizHint').classList.add('hidden');
+    $('#quizFeedback').classList.add('hidden');
+    $('#nextQuestion').classList.add('hidden');
+    $('#quizChoices').innerHTML=q.choices.map((c,i)=>'<button class="choice-button" data-quiz-choice="'+i+'">'+esc(c)+'</button>').join('');
+    $('[data-quiz-choice]').forEach(b=>b.addEventListener('click',()=>{
+      if(quizAnswered) return; quizAnswered=true;
+      const chosen=Number(b.dataset.quizChoice),ok=chosen===q.correct;
+      $('[data-quiz-choice]').forEach((x,i)=>{x.disabled=true;if(i===q.correct)x.classList.add('correct');});
+      if(!ok)b.classList.add('wrong');
+      if(ok){quizScore++;quizStreak++;}else quizStreak=0;
+      $('#quizScore').textContent=quizScore;$('#quizStreak').textContent=quizStreak;
+      $('#quizFeedback').innerHTML='<strong>'+(ok?'Correct.':'Not quite.')+'</strong> '+esc(q.explain);
+      $('#quizFeedback').classList.remove('hidden');$('#nextQuestion').classList.remove('hidden');
+    }));
+  }
+  $('#showHint')?.addEventListener('click',()=>$('#quizHint').classList.toggle('hidden'));
+  $('#nextQuestion')?.addEventListener('click',()=>{quizIndex=(quizIndex+1)%quizOrder.length;renderQuiz();});
+  $('#restartQuiz')?.addEventListener('click',newQuiz);
+
+  newQuiz();
   progress();renderCourse();renderLesson(lesson);setSim(sim);renderFormulaMenu();diagnostic();requestAnimationFrame(()=>{resize();plot('rp9Graph',[],'t / s','ln(V/V₀)');plot('rp10Graph',[],'I / A','F / N');plot('rp11Graph',[],'cosθ','NΦ');});
 })();
