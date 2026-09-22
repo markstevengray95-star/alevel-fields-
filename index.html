@@ -59,6 +59,7 @@
     <button class="nav-button" data-view="lab">Simulations</button>
     <button class="nav-button" data-view="formula">Formula Coach</button>
     <button class="nav-button" data-view="practical">Practicals</button>
+    <button class="nav-button" data-view="exam">Exam Practice</button>
     <button class="nav-button" data-view="mastery">Mastery Hub</button>
     <button class="nav-button" data-view="spec">AQA Map</button>
   </nav>
@@ -230,6 +231,30 @@
           <div class="mini-graph"><canvas id="rp11Graph"></canvas></div>
         </article>
       </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-exam">
+    <div class="section-head">
+      <div><span class="eyebrow">Retrieval + exam language</span><h2>Mixed AQA 3.7 exam practice</h2></div>
+      <p class="muted">Questions span gravitational, electric and magnetic fields, capacitance, induction, AC and transformers.</p>
+    </div>
+    <div class="quiz-layout">
+      <aside class="panel quiz-stats pad">
+        <div class="progress-head"><span>Question</span><strong id="quizProgress">1 / 20</strong></div>
+        <div class="progress-track"><div class="progress-fill" id="quizProgressFill"></div></div>
+        <div class="stat-grid"><div><strong id="quizScore">0</strong><span>correct</span></div><div><strong id="quizStreak">0</strong><span>streak</span></div></div>
+        <button class="button" id="restartQuiz">Restart practice</button>
+      </aside>
+      <article class="panel quiz-main pad">
+        <span class="eyebrow" id="quizSpec">AQA 3.7</span>
+        <h3 id="quizQuestion"></h3>
+        <button class="text-button" id="showHint">Show hint</button>
+        <div class="hint hidden" id="quizHint"></div>
+        <div class="choice-list" id="quizChoices"></div>
+        <div class="feedback hidden" id="quizFeedback"></div>
+        <button class="button primary hidden" id="nextQuestion">Next question</button>
+      </article>
     </div>
   </section>
 
