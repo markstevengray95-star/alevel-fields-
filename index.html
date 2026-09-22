@@ -24,7 +24,7 @@
     <div class="pills">
       <span class="pill">AQA 3.7 aligned</span>
       <span class="pill">18 sequenced lessons</span>
-      <span class="pill">8 interactive models</span>
+      <span class="pill">12 interactive models</span>
     </div>
   </div>
 </header>
@@ -46,8 +46,8 @@
       <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
       <div class="stat-grid">
         <div><strong>18</strong><span>sequenced lessons</span></div>
-        <div><strong>8</strong><span>interactive models</span></div>
-        <div><strong>24</strong><span>formula tools</span></div>
+        <div><strong>12</strong><span>interactive models</span></div>
+        <div><strong>30</strong><span>formula tools</span></div>
         <div><strong>3</strong><span>required practicals</span></div>
       </div>
       <button class="text-button" id="resetProgress">Reset progress</button>
@@ -262,5 +262,10 @@
 
 <script src="data.js?v=1"></script>
 <script src="app.js?v=1"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+}
+</script>
 </body>
 </html>
