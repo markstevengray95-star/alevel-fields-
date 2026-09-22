@@ -39,11 +39,72 @@
   }
   function renderLesson(id){
     const x=D.lessons.find(l=>l.id===id)||D.lessons[0]; lesson=x.id;
-    $('#lessonPanel').innerHTML='<span class="eyebrow">'+esc(x.code)+' · '+esc(x.topic)+'</span><h2>'+esc(x.title)+'</h2><p class="muted">'+esc(x.lead)+'</p><div class="keyword-row">'+x.keywords.map(k=>'<span class="keyword-chip">'+esc(k)+'</span>').join('')+'</div><section class="lesson-section"><h3>Objectives</h3><ul>'+x.objectives.map(a=>'<li>'+esc(a)+'</li>').join('')+'</ul></section><section class="lesson-section"><h3>Retrieval starter</h3>'+x.retrieval.map(a=>'<details><summary>'+esc(a[0])+'</summary><p>'+esc(a[1])+'</p></details>').join('')+'</section><section class="lesson-section"><h3>Core teaching</h3>'+x.teach.map(a=>'<div class="teach-section"><h3>'+esc(a[0])+'</h3><p>'+esc(a[1])+'</p></div>').join('')+'</section><section class="lesson-section"><h3>Equations</h3>'+x.formulas.map(a=>'<span class="equation-chip">'+esc(a)+'</span>').join('')+'</section><section class="lesson-section"><h3>Worked example</h3><p><strong>'+esc(x.worked.q)+'</strong></p><ol>'+x.worked.steps.map(a=>'<li>'+esc(a)+'</li>').join('')+'</ol></section><section class="lesson-section"><h3>Apply it</h3><p>'+esc(x.activity)+'</p></section><section class="lesson-section mission-inline"><h3>Simulation mission</h3><p><strong>'+esc(x.mission.goal)+'</strong></p><ol>'+x.mission.steps.map(a=>'<li>'+esc(a)+'</li>').join('')+'</ol><button class="button primary" id="lessonSim">Open linked simulation</button></section><section class="lesson-section"><h3>AQA exam language</h3><p>'+esc(x.examTip)+'</p><p><strong>Common mistake:</strong> '+esc(x.misconception)+'</p></section><section class="check-card"><h3>Quick check</h3><p>'+esc(x.check[0])+'</p><div class="check-options">'+x.check[1].map((a,i)=>'<button class="button" data-answer="'+i+'">'+esc(a)+'</button>').join('')+'</div><div id="checkResult" class="check-result"></div></section><section class="lesson-section"><h3>Exit ticket</h3><p>'+esc(x.exit)+'</p></section><div class="lesson-footer-actions"><button class="button primary" id="complete">'+(done.has(x.id)?'Mark incomplete':'Mark complete')+'</button><button class="button" id="next">Next lesson</button></div>';
+    const topicFormulas=D.formulas.filter(f=>f.topic===x.topic).slice(0,6);
+    const chunkNames=['Retrieval','Objectives','Textbook chapter','Equations','Maths & graphs','Worked','Calculation practice','Activity','Simulation','Exam mastery','Check','Exit'];
+    const retrieval=x.retrieval.map((a,i)=>'<div class="mini-question"><p><strong>'+(i+1)+'. '+esc(a[0])+'</strong></p><textarea class="student-answer" placeholder="Type your answer here..."></textarea><button class="text-button" data-reveal>Reveal answer</button><div class="answer-reveal">'+esc(a[1])+'</div></div>').join('');
+    const teaching=x.teach.map((a,i)=>'<article class="chapter-section"><span class="chapter-number">'+String(i+1).padStart(2,'0')+'</span><div><h3>'+esc(a[0])+'</h3><p>'+esc(a[1])+'</p></div></article>').join('');
+    const formulaCards=topicFormulas.map((f,i)=>'<article class="equation-card"><div class="equation-card-head"><span class="data-badge">Equation '+(i+1)+'</span><span class="equation-source">AQA 3.7</span></div><h3>'+esc(f.name)+'</h3><div class="big-equation">'+esc(f.eq)+'</div><p>Use this relationship when the stated physical conditions match the model. Keep values in SI units unless the question explicitly permits otherwise.</p></article>').join('');
+    const maths=[
+      'Convert prefixes and standard form before substitution.',
+      'Rearrange symbolically before inserting numbers.',
+      'Use gradients and areas to connect field strength and potential where required.',
+      'Recognise inverse-square, inverse, exponential, cosine and sinusoidal relationships.',
+      'State final answers with appropriate units and sensible significant figures.'
+    ].map(a=>'<li>'+a+'</li>').join('');
+    const graphs=[
+      x.topic==='gravity'?'Interpret g–r and V–r graphs and link potential change to area under a field-strength graph.':'',
+      x.topic==='electric'?'Interpret E–r and V–r graphs and distinguish vector field strength from scalar potential.':'',
+      x.topic==='capacitance'?'Interpret Q/V, exponential charge/discharge and log-linear capacitor plots.':'',
+      x.topic==='magnetic'?'Interpret flux-linkage/angle, induced-emf/time and sinusoidal AC waveforms.':'',
+      x.topic==='fields'?'Compare vector field-line patterns and inverse-square behaviour.':''
+    ].filter(Boolean).map(a=>'<li>'+a+'</li>').join('');
+    const calcPractice=topicFormulas.slice(0,3).map((f,i)=>'<div class="calc-practice"><div class="calc-q"><span class="data-badge">Practice '+(i+1)+'</span><p><strong>Write down '+esc(f.eq)+' from memory, identify every symbol and state the conditions in which it is valid.</strong></p><textarea class="student-answer compact-answer" placeholder="Equation, symbols, units and conditions..."></textarea><button class="text-button" data-formula-reveal="'+i+'">Show equation</button></div><div class="calc-solution" data-formula-solution="'+i+'"><div class="calc-final">'+esc(f.name)+': '+esc(f.eq)+'</div></div></div>').join('');
+    const mastery=x.objectives.concat([
+      'Use the relevant equation without being prompted by name.',
+      'Explain the physics in a linked chain using precise field terminology.',
+      'Interpret an unfamiliar graph or data set from this specification area.'
+    ]).map(a=>'<li>'+esc(a)+'</li>').join('');
+    $('#lessonPanel').innerHTML=
+      '<div class="lesson-meta"><span class="eyebrow">AQA '+esc(x.code)+'</span><span class="data-badge">Paper 2</span></div>'+
+      '<h2>'+esc(x.title)+'</h2><p class="lesson-lead">'+esc(x.lead)+'</p>'+
+      '<div class="keyword-row">'+x.keywords.map(k=>'<span class="keyword-chip">'+esc(k)+'</span>').join('')+'</div>'+
+      '<div class="formula-row">'+x.formulas.map(a=>'<span class="formula-chip">'+esc(a)+'</span>').join('')+'</div>'+
+      '<div class="chunk-strip">'+chunkNames.map((n,i)=>'<button class="chunk-button '+(i===0?'active':'')+'" data-chunk-button="'+i+'">'+n+'</button>').join('')+'</div>'+
+      '<section class="chunk active" data-chunk="0"><div class="lesson-block"><h3>Retrieval starter</h3>'+retrieval+'</div></section>'+
+      '<section class="chunk" data-chunk="1"><div class="lesson-grid"><div class="lesson-block remember"><h3>Learning objectives</h3><ul>'+x.objectives.map(a=>'<li>'+esc(a)+'</li>').join('')+'</ul></div><div class="lesson-block warning"><h3>Common misconception</h3><p>'+esc(x.misconception)+'</p></div></div></section>'+
+      '<section class="chunk" data-chunk="2"><article class="textbook-hook"><span class="eyebrow">Why this matters</span><p>'+esc(x.lead)+'</p><div class="hook-question"><strong>Think first:</strong> '+esc(x.exit)+'</div></article><div class="chapter-body">'+teaching+'</div><div class="chapter-two-col"><aside class="chapter-key"><span class="eyebrow">Key ideas</span><ul>'+x.objectives.map(a=>'<li>'+esc(a)+'</li>').join('')+'</ul></aside><aside class="chapter-exam"><span class="eyebrow">AQA exam focus</span><p>'+esc(x.examTip)+'</p></aside></div><div class="chapter-summary"><h3>In short</h3><ul>'+x.teach.map(a=>'<li><strong>'+esc(a[0])+':</strong> '+esc(a[1])+'</li>').join('')+'</ul></div></section>'+
+      '<section class="chunk" data-chunk="3"><div class="equation-intro"><h3>Equation and calculation guide</h3><p>Know what each equation means, what each symbol represents, the units and the conditions under which it is valid.</p></div><div class="equation-card-grid">'+formulaCards+'</div><button class="button primary" id="openFormulaCoach">Open Formula Coach</button></section>'+
+      '<section class="chunk" data-chunk="4"><div class="lesson-grid"><div class="lesson-block maths-block"><h3>Maths you must be able to do</h3><ul>'+maths+'</ul></div><div class="lesson-block graph-block"><h3>Graphs and data interpretation</h3><ul>'+graphs+'</ul></div></div></section>'+
+      '<section class="chunk" data-chunk="5"><div class="lesson-block worked-block"><h3>Core worked example</h3><p><strong>'+esc(x.worked.q)+'</strong></p><ol>'+x.worked.steps.map(a=>'<li>'+esc(a)+'</li>').join('')+'</ol></div></section>'+
+      '<section class="chunk" data-chunk="6"><div class="lesson-block"><h3>Calculation practice</h3><p class="muted">Attempt each item from memory before revealing the relationship. Then use the Formula Coach for numerical practice.</p>'+calcPractice+'</div></section>'+
+      '<section class="chunk" data-chunk="7"><div class="lesson-block"><h3>Student activity</h3><p>'+esc(x.activity)+'</p><textarea class="student-answer" placeholder="Write your working, explanation or graph reasoning here..."></textarea></div></section>'+
+      '<section class="chunk" data-chunk="8"><div class="lesson-block mission-inline"><span class="eyebrow">Linked simulation mission</span><h3>'+esc(x.mission.goal)+'</h3><ol>'+x.mission.steps.map(a=>'<li>'+esc(a)+'</li>').join('')+'</ol><p><strong>Record:</strong> '+esc(x.mission.record)+'</p><p><strong>Conclude:</strong> '+esc(x.mission.conclusion)+'</p><button class="button primary" id="lessonSim">Open linked simulation</button></div></section>'+
+      '<section class="chunk" data-chunk="9"><div class="lesson-grid"><div class="lesson-block remember"><h3>By the end, you must be able to…</h3><ul class="mastery-list">'+mastery+'</ul></div><div class="lesson-block exam-box"><h3>Exam language</h3><p>'+esc(x.examTip)+'</p><p><strong>Avoid:</strong> '+esc(x.misconception)+'</p></div></div><div class="self-check"><label><input type="checkbox"> I can define the key quantities accurately.</label><label><input type="checkbox"> I can select and use the equations with correct units.</label><label><input type="checkbox"> I can interpret the key graph/data relationship.</label><label><input type="checkbox"> I can explain the physics in full A-level sentences.</label></div></section>'+
+      '<section class="chunk" data-chunk="10"><div class="mini-question"><p><strong>'+esc(x.check[0])+'</strong></p><div class="mini-options">'+x.check[1].map((a,i)=>'<button class="mini-option" data-answer="'+i+'">'+esc(a)+'</button>').join('')+'</div><div class="answer-reveal" id="checkResult">'+esc(x.check[3])+'</div></div></section>'+
+      '<section class="chunk" data-chunk="11"><div class="lesson-block remember"><h3>Exit ticket</h3><p>'+esc(x.exit)+'</p><textarea class="student-answer" placeholder="Write a complete A-level answer..."></textarea></div></section>'+
+      '<div class="lesson-actions"><button class="button primary" id="complete">'+(done.has(x.id)?'✓ Lesson complete':'Mark lesson complete')+'</button><button class="button" id="prev">Previous</button><button class="button" id="next">Next lesson</button></div>';
+    $$('[data-chunk-button]',$('#lessonPanel')).forEach(b=>b.addEventListener('click',()=>{
+      $$('[data-chunk-button]',$('#lessonPanel')).forEach(q=>q.classList.toggle('active',q===b));
+      $$('[data-chunk]',$('#lessonPanel')).forEach(q=>q.classList.toggle('active',q.dataset.chunk===b.dataset.chunkButton));
+    }));
+    $$('[data-reveal]',$('#lessonPanel')).forEach(b=>b.addEventListener('click',()=>b.nextElementSibling.classList.toggle('visible')));
+    $$('[data-formula-reveal]',$('#lessonPanel')).forEach(b=>b.addEventListener('click',()=>{
+      const sol=$('[data-formula-solution="'+b.dataset.formulaReveal+'"]',$('#lessonPanel'));
+      sol.classList.toggle('visible');
+      b.textContent=sol.classList.contains('visible')?'Hide equation':'Show equation';
+    }));
+    $$('[data-answer]',$('#lessonPanel')).forEach(b=>b.addEventListener('click',()=>{
+      const options=$$('[data-answer]',$('#lessonPanel')); options.forEach(q=>q.disabled=true);
+      const chosen=Number(b.dataset.answer), correct=x.check[2];
+      b.classList.add(chosen===correct?'correct':'wrong');
+      if(options[correct]) options[correct].classList.add('correct');
+      $('#checkResult').classList.add('visible');
+    }));
     $('#lessonSim').addEventListener('click',()=>{setSim(x.sim);show('lab');});
-    $$('[data-answer]',$('#lessonPanel')).forEach(b=>b.addEventListener('click',()=>{$('#checkResult').innerHTML='<strong>'+(Number(b.dataset.answer)===x.check[2]?'Correct':'Not quite')+'.</strong> '+esc(x.check[3]);}));
+    $('#openFormulaCoach').addEventListener('click',()=>{const map={gravity:'gravity',electric:'electric',capacitance:'capacitance',magnetic:'magnetic'};$('#formulaTopic').value=map[x.topic]||'all';renderFormulaMenu();show('formula');});
     $('#complete').addEventListener('click',()=>{done.has(x.id)?done.delete(x.id):done.add(x.id);progress();renderCourse();renderLesson(x.id);});
-    $('#next').addEventListener('click',()=>{const i=D.lessons.findIndex(l=>l.id===x.id);const n=D.lessons[Math.min(D.lessons.length-1,i+1)];lesson=n.id;renderCourse();renderLesson(n.id);});
+    $('#prev').addEventListener('click',()=>{const i=D.lessons.findIndex(l=>l.id===x.id);const n=D.lessons[(i-1+D.lessons.length)%D.lessons.length];lesson=n.id;renderCourse();renderLesson(n.id);});
+    $('#next').addEventListener('click',()=>{const i=D.lessons.findIndex(l=>l.id===x.id);const n=D.lessons[(i+1)%D.lessons.length];lesson=n.id;renderCourse();renderLesson(n.id);});
   }
   $$('[data-course-filter]').forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.courseFilter;$$('[data-course-filter]').forEach(q=>q.classList.toggle('primary',q===b));const f=D.lessons.find(x=>filter==='all'||x.topic===filter);if(f)lesson=f.id;renderCourse();renderLesson(lesson);}));
 
