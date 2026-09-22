@@ -88,12 +88,39 @@
   function range(id,out,fn){const e=$('#'+id),o=$('#'+out);const u=()=>o.textContent=fn(Number(e.value));e.addEventListener('input',u);u();}
   range('rp9C','rp9COut',v=>v+' µF');range('rp9R','rp9ROut',v=>fmt(v/1000)+' kΩ');range('rp9T','rp9TOut',v=>fmt(v)+' s');range('rp10I','rp10IOut',v=>fmt(v)+' A');range('rp10L','rp10LOut',v=>fmt(v)+' m');range('rp10B','rp10BOut',v=>fmt(v)+' T');range('rp11Angle','rp11AngleOut',v=>v+'°');range('rp11N','rp11NOut',v=>v);range('rp11B','rp11BOut',v=>fmt(v)+' T');
   const p9=[],p10=[],p11=[];
-  $('#takeRP9').addEventListener('click',()=>{const C=+$('#rp9C').value*1e-6,R=+$('#rp9R').value,tt=+$('#rp9T').value,V=6*Math.exp(-tt/(R*C)),ln=Math.log(V/6);p9.push([tt,V,ln]);$('#rp9Rows').innerHTML=p9.map(q=>'<tr><td>'+fmt(q[0])+'</td><td>'+fmt(q[1])+'</td><td>'+fmt(q[2])+'</td></tr>').join('');$('#rp9Summary').textContent='τ = '+fmt(R*C)+' s · expected log-plot gradient = '+fmt(-1/(R*C))+' s⁻¹';});
-  $('#clearRP9').addEventListener('click',()=>{p9.length=0;$('#rp9Rows').innerHTML='';$('#rp9Summary').textContent='Collect at least five readings.';});
-  $('#takeRP10').addEventListener('click',()=>{const I=+$('#rp10I').value,L=+$('#rp10L').value,B=+$('#rp10B').value,F=B*I*L;p10.push([I,L,B,F]);$('#rp10Rows').innerHTML=p10.map(q=>'<tr><td>'+fmt(q[0])+'</td><td>'+fmt(q[1])+'</td><td>'+fmt(q[2])+'</td><td>'+fmt(q[3])+'</td></tr>').join('');$('#rp10Summary').textContent='For fixed B and L, F against I should be a straight line through the origin.';});
-  $('#clearRP10').addEventListener('click',()=>{p10.length=0;$('#rp10Rows').innerHTML='';});
-  $('#takeRP11').addEventListener('click',()=>{const a=+$('#rp11Angle').value,N=+$('#rp11N').value,B=+$('#rp11B').value,c=Math.cos(a*Math.PI/180),fl=B*.01*N*c;p11.push([a,c,fl]);$('#rp11Rows').innerHTML=p11.map(q=>'<tr><td>'+fmt(q[0])+'</td><td>'+fmt(q[1])+'</td><td>'+fmt(q[2])+'</td></tr>').join('');$('#rp11Summary').textContent='NΦ should be directly proportional to cosθ.';});
-  $('#clearRP11').addEventListener('click',()=>{p11.length=0;$('#rp11Rows').innerHTML='';});
+  function plot(id,points,xLabel,yLabel){
+    const c=$('#'+id); if(!c) return;
+    const r=c.getBoundingClientRect(), d=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+    const w=Math.max(260,r.width||420), h=Math.max(180,r.height||230);
+    c.width=Math.round(w*d); c.height=Math.round(h*d);
+    const g=c.getContext('2d'); g.setTransform(d,0,0,d,0,0);
+    g.fillStyle='#071522'; g.fillRect(0,0,w,h);
+    const p=34;
+    for(let i=0;i<=5;i++){
+      lineGraph(g,p,p+i*(h-2*p)/5,w-p,p+i*(h-2*p)/5,'rgba(255,255,255,.10)');
+      lineGraph(g,p+i*(w-2*p)/5,p,p+i*(w-2*p)/5,h-p,'rgba(255,255,255,.10)');
+    }
+    lineGraph(g,p,h-p,w-p,h-p,'#7f96aa'); lineGraph(g,p,p,p,h-p,'#7f96aa');
+    if(points.length){
+      const xs=points.map(q=>q[0]), ys=points.map(q=>q[1]);
+      const xmin=Math.min(...xs), xmax=Math.max(...xs), ymin=Math.min(...ys), ymax=Math.max(...ys);
+      const sx=x=>p+(x-xmin)/(xmax-xmin||1)*(w-2*p);
+      const sy=y=>h-p-(y-ymin)/(ymax-ymin||1)*(h-2*p);
+      const sorted=points.slice().sort((a,b)=>a[0]-b[0]);
+      g.strokeStyle='#67c7ff'; g.lineWidth=2; g.beginPath();
+      sorted.forEach((q,i)=>{const X=sx(q[0]),Y=sy(q[1]);i?g.lineTo(X,Y):g.moveTo(X,Y);}); g.stroke();
+      g.fillStyle='#f2c14e'; points.forEach(q=>{g.beginPath();g.arc(sx(q[0]),sy(q[1]),4,0,Math.PI*2);g.fill();});
+    }
+    g.fillStyle='#b8cadb'; g.font='11px system-ui'; g.fillText(xLabel,w/2-18,h-8);
+    g.save(); g.translate(11,h/2+20); g.rotate(-Math.PI/2); g.fillText(yLabel,0,0); g.restore();
+  }
+  function lineGraph(g,x1,y1,x2,y2,c){g.strokeStyle=c;g.lineWidth=1;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();}
+  $('#takeRP9').addEventListener('click',()=>{const C=+$('#rp9C').value*1e-6,R=+$('#rp9R').value,tt=+$('#rp9T').value,V=6*Math.exp(-tt/(R*C)),ln=Math.log(V/6);p9.push([tt,V,ln]);$('#rp9Rows').innerHTML=p9.map(q=>'<tr><td>'+fmt(q[0])+'</td><td>'+fmt(q[1])+'</td><td>'+fmt(q[2])+'</td></tr>').join('');$('#rp9Summary').textContent='τ = '+fmt(R*C)+' s · expected log-plot gradient = '+fmt(-1/(R*C))+' s⁻¹';plot('rp9Graph',p9.map(q=>[q[0],q[2]]),'t / s','ln(V/V₀)');});
+  $('#clearRP9').addEventListener('click',()=>{p9.length=0;$('#rp9Rows').innerHTML='';$('#rp9Summary').textContent='Collect at least five readings.';plot('rp9Graph',[],'t / s','ln(V/V₀)');});
+  $('#takeRP10').addEventListener('click',()=>{const I=+$('#rp10I').value,L=+$('#rp10L').value,B=+$('#rp10B').value,F=B*I*L;p10.push([I,L,B,F]);$('#rp10Rows').innerHTML=p10.map(q=>'<tr><td>'+fmt(q[0])+'</td><td>'+fmt(q[1])+'</td><td>'+fmt(q[2])+'</td><td>'+fmt(q[3])+'</td></tr>').join('');$('#rp10Summary').textContent='For fixed B and L, F against I should be a straight line through the origin.';plot('rp10Graph',p10.map(q=>[q[0],q[3]]),'I / A','F / N');});
+  $('#clearRP10').addEventListener('click',()=>{p10.length=0;$('#rp10Rows').innerHTML='';plot('rp10Graph',[],'I / A','F / N');});
+  $('#takeRP11').addEventListener('click',()=>{const a=+$('#rp11Angle').value,N=+$('#rp11N').value,B=+$('#rp11B').value,c=Math.cos(a*Math.PI/180),fl=B*.01*N*c;p11.push([a,c,fl]);$('#rp11Rows').innerHTML=p11.map(q=>'<tr><td>'+fmt(q[0])+'</td><td>'+fmt(q[1])+'</td><td>'+fmt(q[2])+'</td></tr>').join('');$('#rp11Summary').textContent='NΦ should be directly proportional to cosθ.';plot('rp11Graph',p11.map(q=>[q[1],q[2]]),'cosθ','NΦ');});
+  $('#clearRP11').addEventListener('click',()=>{p11.length=0;$('#rp11Rows').innerHTML='';plot('rp11Graph',[],'cosθ','NΦ');});
 
   function diagnostic(){const d=D.diagnostics[Math.floor(Math.random()*D.diagnostics.length)];$('#diagnosticBox').innerHTML='<p><strong>'+esc(d.q)+'</strong></p><textarea placeholder="Write your answer first..."></textarea><button class="button" id="reveal">Reveal answer</button><div class="diagnostic-answer" id="diagAnswer">'+esc(d.a)+'</div>';$('#reveal').addEventListener('click',()=>$('#diagAnswer').classList.add('show'));}
   $('#newDiagnostic').addEventListener('click',diagnostic);
@@ -102,5 +129,5 @@
   $('#equationLinks').innerHTML='<div class="comparison-grid"><div class="mini"><strong>Gravity</strong><p>F → g → V → orbit</p></div><div class="mini"><strong>Electric</strong><p>F → E → V → capacitance</p></div><div class="mini"><strong>Magnetic</strong><p>F → flux → induction → AC</p></div></div>';
   $('#specMap').innerHTML=D.specMap.map(r=>'<div class="spec-card"><strong>'+esc(r[0])+'</strong><span>'+esc(r[1])+'</span><span>'+esc(r[2])+'</span><span>'+esc(r[3])+'</span></div>').join('');
 
-  progress();renderCourse();renderLesson(lesson);setSim(sim);renderFormulaMenu();diagnostic();requestAnimationFrame(resize);
+  progress();renderCourse();renderLesson(lesson);setSim(sim);renderFormulaMenu();diagnostic();requestAnimationFrame(()=>{resize();plot('rp9Graph',[],'t / s','ln(V/V₀)');plot('rp10Graph',[],'I / A','F / N');plot('rp11Graph',[],'cosθ','NΦ');});
 })();
