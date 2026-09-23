@@ -12,7 +12,7 @@
   addCss('enhancements-v5.css?v=5','fields-v5');
   addCss('enhancements-v7.css?v=7.1','fields-v7');
   addCss('enhancements-v8.css?v=8','fields-v8');
-  addCss('enhancements-v9.css?v=9','fields-v9');
+  addCss('enhancements-v9.css?v=9.1','fields-v9');
   const loadEnhancements = () => {
     if (document.querySelector('script[data-fields-v9-equations]')) return;
     [
@@ -22,8 +22,9 @@
       ['lesson-depth-v7.js?v=7.1','fieldsV7'],
       ['v7-reliability.js?v=7.1','fieldsV7Reliability'],
       ['learning-v8.js?v=8','fieldsV8Learning'],
-      ['sim-runtime-v9.js?v=9','fieldsV9Runtime'],
-      ['equation-clinic-v9.js?v=9','fieldsV9Equations']
+      ['legacy-motion-v9.js?v=9.1','fieldsV9LegacyMotion'],
+      ['sim-runtime-v9.js?v=9.1','fieldsV9Runtime'],
+      ['equation-clinic-v9.js?v=9.1','fieldsV9Equations']
     ].forEach(([src,key]) => {
       const s = document.createElement('script');
       s.src = src;
@@ -34,7 +35,7 @@
     if (!document.querySelector('script[data-fields-v9-three]')) {
       const m = document.createElement('script');
       m.type = 'module';
-      m.src = 'three-lab-v9.js?v=9';
+      m.src = 'three-lab-v9.js?v=9.1';
       m.dataset.fieldsV9Three = 'true';
       document.body.appendChild(m);
     }
