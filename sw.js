@@ -1,4 +1,4 @@
-const CACHE = "aqa-fields-lab-v7.1";
+const CACHE = "aqa-fields-lab-v8";
 const ASSETS = [
   "./",
   "./index.html",
@@ -10,6 +10,7 @@ const ASSETS = [
   "./enhancements-v4.css",
   "./enhancements-v5.css",
   "./enhancements-v7.css",
+  "./enhancements-v8.css",
   "./data.js",
   "./app.js",
   "./enhancements.js",
@@ -23,6 +24,8 @@ const ASSETS = [
   "./v6-upgrades.js",
   "./lesson-depth-v7.js",
   "./v7-reliability.js",
+  "./learning-v8.js",
+  "./three-lab-v8.js",
   "./physics-icon.svg",
   "./manifest.webmanifest"
 ];
@@ -39,7 +42,7 @@ self.addEventListener("fetch", event => {
   event.respondWith(
     fetch(event.request).then(response => {
       const copy = response.clone();
-      caches.open(CACHE).then(cache => cache.put(event.request, copy));
+      caches.open(CACHE).then(cache => cache.put(event.request, copy)).catch(()=>{});
       return response;
     }).catch(() => caches.match(event.request).then(cached => cached || caches.match("./index.html")))
   );
