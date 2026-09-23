@@ -1,4 +1,4 @@
-const CACHE = "aqa-fields-lab-v4";
+const CACHE = "aqa-fields-lab-v5";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,14 +8,16 @@ const ASSETS = [
   "./enhancements.css",
   "./enhancements-v3.css",
   "./enhancements-v4.css",
+  "./enhancements-v5.css",
   "./data.js",
   "./app.js",
-  "./enhancements.js",
   "./textbook-v3.js",
   "./sim-pro-v3.js",
   "./textbook-v4.js",
   "./real-apparatus-v4.js",
   "./extended-response-v4.js",
+  "./topic-practice-v5.js",
+  "./sim-challenges-v5.js",
   "./physics-icon.svg",
   "./manifest.webmanifest"
 ];
