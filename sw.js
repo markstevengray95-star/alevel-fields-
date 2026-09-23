@@ -1,12 +1,14 @@
-const CACHE = "aqa-fields-lab-v1";
+const CACHE = "aqa-fields-lab-v2";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./further.css",
   "./fields.css",
+  "./enhancements.css",
   "./data.js",
   "./app.js",
+  "./enhancements.js",
   "./physics-icon.svg",
   "./manifest.webmanifest"
 ];
