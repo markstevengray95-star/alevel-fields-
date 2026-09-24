@@ -13,8 +13,9 @@
   addCss('enhancements-v7.css?v=7.1','fields-v7');
   addCss('enhancements-v8.css?v=8','fields-v8');
   addCss('enhancements-v9.css?v=9.1','fields-v9');
+  addCss('enhancements-v10.css?v=10','fields-v10');
   const loadEnhancements = () => {
-    if (document.querySelector('script[data-fields-v9-equations]')) return;
+    if (document.querySelector('script[data-fields-v10-lessons]')) return;
     [
       ['topic-practice-v5.js?v=5','fieldsV5'],
       ['sim-challenges-v5.js?v=5','fieldsV5'],
@@ -24,7 +25,8 @@
       ['learning-v8.js?v=8','fieldsV8Learning'],
       ['legacy-motion-v9.js?v=9.1','fieldsV9LegacyMotion'],
       ['sim-runtime-v9.js?v=9.1','fieldsV9Runtime'],
-      ['equation-clinic-v9.js?v=9.1','fieldsV9Equations']
+      ['equation-clinic-v9.js?v=9.1','fieldsV9Equations'],
+      ['lesson-depth-v10.js?v=10','fieldsV10Lessons']
     ].forEach(([src,key]) => {
       const s = document.createElement('script');
       s.src = src;
@@ -37,6 +39,13 @@
       m.type = 'module';
       m.src = 'three-lab-v9.js?v=9.1';
       m.dataset.fieldsV9Three = 'true';
+      document.body.appendChild(m);
+    }
+    if (!document.querySelector('script[data-fields-v10-core-three]')) {
+      const m = document.createElement('script');
+      m.type = 'module';
+      m.src = 'core-3d-v10.js?v=10';
+      m.dataset.fieldsV10CoreThree = 'true';
       document.body.appendChild(m);
     }
   };
