@@ -14,8 +14,9 @@
   addCss('enhancements-v8.css?v=8','fields-v8');
   addCss('enhancements-v9.css?v=9.1','fields-v9');
   addCss('enhancements-v10.css?v=10','fields-v10');
+  addCss('enhancements-v11.css?v=11','fields-v11');
   const loadEnhancements = () => {
-    if (document.querySelector('script[data-fields-v10-lessons]')) return;
+    if (document.querySelector('script[data-fields-v11-three-polish]')) return;
     [
       ['topic-practice-v5.js?v=5','fieldsV5'],
       ['sim-challenges-v5.js?v=5','fieldsV5'],
@@ -26,7 +27,9 @@
       ['legacy-motion-v9.js?v=9.1','fieldsV9LegacyMotion'],
       ['sim-runtime-v9.js?v=9.1','fieldsV9Runtime'],
       ['equation-clinic-v9.js?v=9.1','fieldsV9Equations'],
-      ['lesson-depth-v10.js?v=10','fieldsV10Lessons']
+      ['lesson-depth-v10.js?v=10','fieldsV10Lessons'],
+      ['lesson-visuals-v11.js?v=11','fieldsV11Lessons'],
+      ['three-polish-v11.js?v=11','fieldsV11ThreePolish']
     ].forEach(([src,key]) => {
       const s = document.createElement('script');
       s.src = src;
@@ -44,7 +47,7 @@
     if (!document.querySelector('script[data-fields-v10-core-three]')) {
       const m = document.createElement('script');
       m.type = 'module';
-      m.src = 'core-3d-v10.js?v=10';
+      m.src = 'core-3d-v10.js?v=10.1';
       m.dataset.fieldsV10CoreThree = 'true';
       document.body.appendChild(m);
     }
